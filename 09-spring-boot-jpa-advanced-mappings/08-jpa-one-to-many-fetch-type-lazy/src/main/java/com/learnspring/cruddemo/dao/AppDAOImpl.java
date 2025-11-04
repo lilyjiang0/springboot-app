@@ -1,0 +1,74 @@
+package com.learnspring.cruddemo.dao;
+
+import com.learnspring.cruddemo.entity.Course;
+import com.learnspring.cruddemo.entity.Instructor;
+import com.learnspring.cruddemo.entity.InstructorDetail;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public class AppDAOImpl implements AppDAO{
+    // Define field for entity manager.
+    private EntityManager entityManager;
+    // Inject entity manager using constructor injection.
+    @Autowired
+    public AppDAOImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    @Override
+    @Transactional
+    public void save(Instructor instructor) {
+        entityManager.persist(instructor);
+    }
+
+    @Override
+    public Instructor findInstructorById(int id) {
+        return entityManager.find(Instructor.class, id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteInstructorById(int id) {
+        // Retrieve the instructor.
+        Instructor tempInstructor = entityManager.find(Instructor.class, id);
+        // Delete the instructor.
+        entityManager.remove(tempInstructor);
+    }
+
+    @Override
+    public InstructorDetail findInstructorDetailById(int id) {
+        return entityManager.find(InstructorDetail.class, id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteInstructorDetailById(int id) {
+        // Retrieve instructor detail by id.
+        InstructorDetail tempInstructorDetail = entityManager.find(InstructorDetail.class, id);
+        // Remove the associated object references.
+        // Break the bidirectional link.
+        tempInstructorDetail.getInstructor().setInstructorDetail(null);
+        // Delete instructor detail.
+        entityManager.remove(tempInstructorDetail);
+    }
+
+    @Override
+    public List<Course> findCoursesByInstructorId(int id) {
+        // Create query.
+        TypedQuery<Course> query = entityManager.createQuery(
+                "from Course where instructor.id = :data", Course.class
+        );
+        query.setParameter("data", id);
+
+        // Execute the query.
+        List<Course> courses = query.getResultList();
+
+        return courses;
+    }
+}

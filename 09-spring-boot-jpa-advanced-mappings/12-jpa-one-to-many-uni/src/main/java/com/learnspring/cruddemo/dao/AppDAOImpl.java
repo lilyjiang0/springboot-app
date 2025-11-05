@@ -133,4 +133,23 @@ public class AppDAOImpl implements AppDAO{
     public void save(Course course) {
         entityManager.persist(course);
     }
+
+    /*
+    Find course and lazy loading reviews, using join fetch.
+     */
+    @Override
+    public Course findCourseAndReviewsByCourseId(int id) {
+        // Create query.
+        TypedQuery<Course> query = entityManager.createQuery(
+                "select c from Course c "
+                    + "JOIN FETCH c.reviews "
+                    + "where c.id = :data"
+                , Course.class
+        );
+        query.setParameter("data", id);
+        // Execute query.
+        Course course = query.getSingleResult();
+
+        return course;
+    }
 }

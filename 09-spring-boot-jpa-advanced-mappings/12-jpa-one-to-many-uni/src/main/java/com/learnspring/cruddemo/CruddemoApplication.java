@@ -23,8 +23,17 @@ public class CruddemoApplication {
 	public CommandLineRunner commandLineRunner(AppDAO appDAO) {
 		return runner -> {
 //			createCourseAndReviews(appDAO);
-			findCoursesAndReviewsById(appDAO);
+//			findCoursesAndReviewsById(appDAO);
+			removeCourseAndReviews(appDAO);
 		};
+	}
+
+	private void removeCourseAndReviews(AppDAO appDAO) {
+		int id = 10;
+		System.out.println("Deleting course id: " + id);
+		// Delete both course and reviews because of casacade type = all.
+		appDAO.deleteCourseById(id);
+		System.out.println("Course and related reviews deleted!");
 	}
 
 	private void findCoursesAndReviewsById(AppDAO appDAO) {

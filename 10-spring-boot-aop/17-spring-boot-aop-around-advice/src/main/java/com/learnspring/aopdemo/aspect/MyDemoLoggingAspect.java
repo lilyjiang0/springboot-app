@@ -2,6 +2,7 @@ package com.learnspring.aopdemo.aspect;
 
 import com.learnspring.aopdemo.Account;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.Order;
@@ -13,10 +14,27 @@ import java.util.List;
 @Component
 @Order(3)
 public class MyDemoLoggingAspect {
-    // Advice for @Around on the findAccounts method.
+    // Advice for @Around on the getFortune method.
     // Like a @Before + @After, but give you more control of the process.
     // Use cases e.g. logging, auditing, security, pre-processing and post-processing data.
-    @Around()
+    @Around("execution(* com.learnspring.aopdemo.service.*.getFortune(..))")
+    public Object aroundGetFortune(
+            ProceedingJoinPoint proceedingJoinPoint
+    ) throws Throwable {
+        // Print out method name.
+        String methodName = proceedingJoinPoint.getSignature().toShortString();
+        System.out.println("\n =========>> Executing @Around on method: " + methodName);
+        // Get begin timestamp.
+        long begin = System.currentTimeMillis();
+        // Execute method.
+        Object result = proceedingJoinPoint.proceed();
+        // Get end timestamp.
+        long end = System.currentTimeMillis();
+        // Compute duration and display.
+        long duration = end - begin;
+        System.out.println("===========> Duration: " + duration / 1000.0 + " seconds");
+        return result;
+    }
 
 
     // Advice for @After on the findAccounts method.
